@@ -240,6 +240,33 @@ App.ServicesShowRoute = App.BaseRoute.extend({
     // Here we just use the built-in health endpoint, as it gives us everything
     // we need.
     return Ember.$.getJSON(formatUrl(consulHost + '/v1/health/service/' + params.name, dc, token)).then(function(data) {
+      if (params.name) {
+        return Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/kv/consul_metadata/services/' + params.name + '?recurse=true', dc, token))).then(
+          function(linkdata) {
+            links = []
+            linkdata.forEach(function(item, index) {
+              parts = item['Key'].split('/');
+              new_hash = {}
+              new_hash['text'] = parts[parts.length-1]
+              new_hash['url'] = Base64.fromBase64(item['Value'])
+              links.push(new_hash)
+            })
+            var objs = [];
+            data.map(function(obj){
+              obj['Service']['links'] = links
+              objs.push(App.Node.create(obj));
+            });
+            return objs
+          },
+          function(err) {
+            var objs = [];
+            data.map(function(obj){
+              obj['Service']['links'] = []
+              objs.push(App.Node.create(obj));
+            });
+            return objs
+          })
+      }
       var objs = [];
       data.map(function(obj){
        objs.push(App.Node.create(obj));
@@ -338,8 +365,25 @@ App.NodesShowRoute = App.BaseRoute.extend({
         median: parseInt(median * 100) / 100,
         max: parseInt(max * 100) / 100
       },
-      node: Ember.$.getJSON(formatUrl(consulHost + '/v1/internal/ui/node/' + params.name, dc.dc, token)).then(function(data) {
-        return App.Node.create(data);
+      node: Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/internal/ui/node/' + params.name, dc.dc, token))).then(function(data) {
+        return Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/kv/consul_metadata/nodes/' + params.name + '?recurse=true', dc.dc, token))).then(
+          function(linkdata) {
+            links = []
+            linkdata.forEach(function(item, index) {
+              parts = item['Key'].split('/');
+              new_hash={}
+              new_hash['text'] = parts[parts.length-1]
+              new_hash['url'] = Base64.fromBase64(item['Value'])
+              links.push(new_hash)
+            })
+            data['links'] = links
+            return App.Node.create(data)
+          },
+          function(err) {
+            data['links'] = []
+            return App.Node.create(data)
+          }
+        )
       }),
       nodes: Ember.$.getJSON(formatUrl(consulHost + '/v1/internal/ui/node/' + params.name, dc.dc, token)).then(function(data) {
         return App.Node.create(data);

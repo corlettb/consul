@@ -431,6 +431,18 @@
         <p>No tags</p>
       {{/if}}
 
+      {{#if model.0.Service.links.length }}
+      <h5>Links</h5>
+        {{#each link in model.0.Service.links }}
+          <a target="_blank" href="{{unbound link.url}}">
+            <div class="list-group-item list-condensed-link double-line">
+              <div class="list-bar-horizontal bg-green"></div>
+              {{ link.text }}
+            </div>
+          </a>
+        {{/each}}
+      {{/if}}
+
       <h5>Nodes</h5>
 
       {{#each node in model }}
@@ -553,7 +565,6 @@
               {{serviceTagMessage service.Tags}}
             </ul>
         {{/link-to}}
-
       {{/each}}
 
       <h5>Checks</h5>
@@ -579,6 +590,18 @@
         </div>
 
       {{/each}}
+
+      {{#if model.links.length }}
+      <h5>Links</h5>
+        {{#each link in model.links }}
+          <a target="_blank" href="{{unbound link.url}}">
+            <div class="list-group-item list-condensed-link double-line">
+              <div class="list-bar-horizontal bg-green"></div>
+              {{ link.text }}
+            </div>
+          </a>
+        {{/each}}
+      {{/if}}
 
       <h5>Lock Sessions</h5>
 
