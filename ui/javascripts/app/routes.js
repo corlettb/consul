@@ -241,7 +241,7 @@ App.ServicesShowRoute = App.BaseRoute.extend({
     // we need.
     return Ember.$.getJSON(formatUrl(consulHost + '/v1/health/service/' + params.name, dc, token)).then(function(data) {
       if (params.name) {
-        return Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/kv/consul_metadata/services/' + params.name + '?recurse=true', dc, token))).then(
+        return Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/kv/consul_metadata/services/' + params.name + '/?recurse=true', dc, token))).then(
           function(linkdata) {
             links = []
             linkdata.forEach(function(item, index) {
@@ -366,7 +366,7 @@ App.NodesShowRoute = App.BaseRoute.extend({
         max: parseInt(max * 100) / 100
       },
       node: Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/internal/ui/node/' + params.name, dc.dc, token))).then(function(data) {
-        return Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/kv/consul_metadata/nodes/' + params.name + '?recurse=true', dc.dc, token))).then(
+        return Promise.resolve(Ember.$.getJSON(formatUrl(consulHost + '/v1/kv/consul_metadata/nodes/' + params.name + '/?recurse=true', dc.dc, token))).then(
           function(linkdata) {
             links = []
             linkdata.forEach(function(item, index) {
